@@ -1,0 +1,28 @@
+#include<stdio.h>
+int main()
+{
+ int a[10]={1,2,3,4,5,6,7,8,9,10};
+ int i,n,g,sum=0,j;
+ clrscr();
+ printf("Enter your goal");
+ scanf("%d",g);
+ for(i=0;i<10;i++)
+ {
+    for(j=i+1;j<10;j++)
+    {
+      sum=a[i]+sum;
+    }
+    }
+  if(g==sum)  {
+      printf("yes goal acheve");
+     break;
+     }
+     else
+     printf("no goal is no acive");
+
+
+
+ printf("");
+ getch();
+return 0 ;
+}

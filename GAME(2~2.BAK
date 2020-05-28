@@ -1,0 +1,147 @@
+ #include<stdio.h>
+ #include<conio.h>
+// puch();
+ //puuch();
+ int a[9];
+ int i=0,d,p1=0,p2=0,top=0,bot=8;
+ void main()
+ {
+  clrscr();
+  printf("eNTER ARRAY\n");
+  for(i=0;i<9;i++)
+  {
+   scanf("%d",&a[i]);
+  }
+  while(top<bot){
+	printf("Enter T ot b");
+	d=0;
+	scanf("%d",&d);
+	if(d==1) {
+	p1=p1+a[top];
+	printf("%d \n",p1);
+	top++;
+	}
+	if(d==2)
+	{
+		p1=p1+a[bot];
+		printf("%d\n",p1);
+		bot--;
+	}
+}
+getch();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
