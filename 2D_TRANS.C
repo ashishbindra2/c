@@ -1,0 +1,257 @@
+#include <graphics.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <conio.h>
+#include <math.h>
+#include <dos.h>
+#include <string.h>
+#include <ctype.h>
+
+int maxX,maxY,midX,midY;
+
+void draw_poly(int,int[3][20],int);
+void translation(int,int,float[3][3]);
+void scaling(float,float,float[3][3]);
+void rotation(float,float[3][3]);
+void rotation_about(float,float[3][3],int,int);
+void reflectionX(float[3][3]);
+void reflectionY(float[3][3]);
+void mirror_reflection(float,float[3][3],int);
+void transform(int,int[3][20],float[3][3],int[3][20]);
+void scaling_about(float,float,int,int,float trans[3][3]);
+void shearingX(float[3][3],int);
+void shearingY(float[3][3],int);
+void shearing_about(float[3][3],int,int);
+int main(void)
+{
+   int gdriver = DETECT, gmode, errorcode;
+   int ch,x,y,n,i,tx,ty,b,a;
+   int obj[3][20]={0},objdash[3][20]={0};
+   float trans[3][3];
+   float sX,sY,de,re;
+   int h,k;
+
+   int vx[] = {200,200,100};//{25,160,35};//, 100,135};
+   int vy[] ={200,100,200}; //{35,50,125};//, 0,135};
+   initgraph(&gdriver, &gmode, "C://turboc3//bgi");
+   errorcode = graphresult();
+   if (errorcode != grOk)
+   {
+      printf("Graphics error: %s\n", grapherrormsg(errorcode));
+      printf("Press any key to halt:");
+      getch();
+      exit(1);             /* return with error code */
+   }
+
+   maxX = getmaxx();
+   maxY = getmaxy();
+   midX = maxX/2;
+   midY = maxY/2;
+
+   line(0,midY,maxX,midY);
+   line(midX,0,midX,maxY);
+
+   outtextxy(midX-80,maxY-20,"-Y-AXIS");
+   outtextxy(midX-80,0,"Y-AXIS");
+   outtextxy(maxX-80,midY,"X-AXIS");
+   outtextxy(0,maxX-80,"-X-AXIS");
+   n=3;
+   for(i=0;i<n;i++)
+   {
+       obj[0][i] = vx[i];
+       obj[1][i] = vy[i];
+       obj[2][i] = 1;
+   }
+
+    draw_poly(n,obj,GREEN);
+    printf("1) Translation \n2) Scaling \n3) Scaling about h,k \n4) Rotation \n5) Rotation about h,k \n6) Mirror reflectionabout x-axis \n");
+    printf("7) Mirror reflection about y-axis\n");
+    printf("8) Mirror reflection about gernalline  L:y=mx+b\n");
+    printf("9) Shearing along y-axis\n");
+    printf("10) Sharing along x-axis\n11) Shearing generaln line\n");
+    scanf("%d",&ch);
+    switch(ch)
+    {
+       case 1:
+	   printf("Enter translation x and  y cordinates \n");
+	   scanf("%d %d",&tx,&ty);
+	   translation(tx,ty,trans);
+	   break;
+       case 2:
+	   printf("Enter sx and sy values: ");
+	   scanf("%f %f",&sX,&sY);
+	   scaling(sX,sY,trans);
+	   break;
+       case 3:
+	    printf("Enter the value of sx,sy: ");
+	    scanf("%f %f",&sX,&sY);
+	    printf("enter h,k: ");
+	    scanf("%d %d",&h,&k);
+	    scaling_about(sX,sY,h,k,trans);
+	break;
+       case 4:
+	   printf("this is radian \n");
+	   de=90;
+	   re = de*M_PI/180.0;
+	   rotation(re,trans);
+	   break;
+       case 5:
+	   printf("Enter the vlue of h,k :");
+	   scanf("%d %d",&h,&k);
+	   de=45;
+	   re = de*M_PI/180.0;
+	   rotation_about(re,trans,h,k);
+	   break;
+       case 6:
+	   reflectionX(trans);
+	   break;
+       case 7:
+	   reflectionY(trans);
+	   break;
+       case 8:
+	   de=45;b=9;
+	   re = de*M_PI/180.0;
+	   mirror_reflection(re,trans,b);
+	   break;
+       case 9:
+	    printf("Enter the valu of Sa : ");
+	    scanf("%d",&a);
+	    shearingX(trans,a);
+	    break;
+       case 10:
+	    printf("Enter the valu of Sb : ");
+	    scanf("%d",&b);
+	    shearingX(trans,b);
+	    break;
+       case 11:
+	    printf("Enter the valu of Sa,Sb : ");
+	    scanf("%d %d",&a,&b);
+	    shearing_about(trans,a,b);
+       break;
+       default:printf("Wrong choice :");
+	       getch();
+	       exit(0);
+
+    }
+      transform(n,obj,trans,objdash);
+      draw_poly(n,objdash,WHITE);
+
+
+   getch();
+   closegraph();
+   return 0;
+}
+
+void draw_poly(int n,int obj[3][20],int color)
+{
+   char t[3];
+   int i;
+   t[0] = 'v';
+   t[2] = '\0';
+   setcolor(color);
+   for(i=0;i<n;i++)
+   {
+       line(midX+obj[0][i], midY-obj[1][i], midX+obj[0][(i+1)%n],midY - obj[1][(i+1)%n]);
+       t[1] = (char) toascii(48+i);
+       outtextxy(midX + obj[0][i], midY - obj[1][i],t);
+   }
+}
+void translation(int tx,int ty,float trans[3][3])
+{
+   trans[0][0] = 1.0; trans[0][1] = 0; trans[0][2] = tx;
+   trans[1][0] = 0; trans[1][1] = 1.0; trans[1][2] = ty;
+   trans[2][0] = 0; trans[2][1] = 0; trans[2][2]=1.0;
+}
+void scaling(float sx,float sy,float trans[3][3])
+{
+   trans[0][0] = sx; trans[0][1] = 0; trans[0][2] = 0;
+   trans[1][0] = 0; trans[1][1] = sy; trans[1][2] = 0;
+   trans[2][0] = 0; trans[2][1] = 0; trans[2][2] = 1.0;
+}
+void rotation(float theta,float trans[3][3])
+{
+   float C,S;
+   C = cos(theta);
+   S = sin(theta);
+   trans[0][0] = C; trans[0][1] = -S; trans[0][2]= 0;
+   trans[1][0] = S; trans[1][1] = C; trans[1][2]= 0;
+   trans[2][0] = 0; trans[2][1] = 0; trans[2][2]= 1.0;
+
+}
+void rotation_about(float theta,float trans[3][3],int h,int k)
+{
+   float C,S;
+   C = cos(theta);
+   S = sin(theta);
+   trans[0][0] = C; trans[0][1] = -S; trans[0][2] = -h*C+k*S+h;
+   trans[1][0] = S; trans[1][1] = C;  trans[1][2] = -h*S-k*C+k;
+   trans[2][0] = 0; trans[2][1] = 0;  trans[2][2] = 1.0;
+
+}
+void shearingX(float trans[3][3],int a)
+{
+
+   trans[0][0] = 1; trans[0][1] = a; trans[0][2] = 0;
+   trans[1][0] = 0; trans[1][1] = 1;  trans[1][2] = 0;
+   trans[2][0] = 0; trans[2][1] = 0;  trans[2][2] = 1.0;
+}
+
+void shearingY(float trans[3][3],int b)
+{
+
+   trans[0][0] = 1; trans[0][1] = 0; trans[0][2] = 0;
+   trans[1][0] = b; trans[1][1] = 1;  trans[1][2] = 0;
+   trans[2][0] = 0; trans[2][1] = 0;  trans[2][2] = 1.0;
+}
+
+void shearing_about(float trans[3][3],int a,int b)
+{
+
+   trans[0][0] = 1; trans[0][1] = a; trans[0][2] = 0;
+   trans[1][0] = b; trans[1][1] = 1;  trans[1][2] = 0;
+   trans[2][0] = 0; trans[2][1] = 0;  trans[2][2] = 1.0;
+}
+
+void mirror_reflection(float theta,float trans[3][3],int b)
+{
+   float C,S;
+   C = cos(theta);
+   S = sin(theta);
+   trans[0][0] = C*C-S*S; trans[0][1] = 2*S*C;   trans[0][2] = -2*b*S*C;
+   trans[1][0] = 2*S*C;   trans[1][1] = S*S-C*C; trans[1][2] = -b*S*S+b*C*C+b;
+   trans[2][0] = 0;       trans[2][1] = 0;       trans[2][2] = 1.0;
+
+}
+void reflectionX(float trans[3][3])
+{
+   trans[0][0] = 1.0; trans[0][1]=0; trans[0][2]=0;
+   trans[1][0] = 0; trans[1][1]=-1.0; trans[1][2]=0;
+   trans[2][0] = 0; trans[2][1]=0; trans[2][2]=1.0;
+}
+
+void reflectionY(float trans[3][3])
+{
+   trans[0][0] = -1; trans[0][1]=0; trans[0][2]=0;
+   trans[1][0] = 0; trans[1][1]=1; trans[1][2]=0;
+   trans[2][0] = 0; trans[2][1]=0; trans[2][2]=1;
+}
+void scaling_about(float sx,float sy,int h,int k,float trans[3][3])
+{
+   trans[0][0] = sx; trans[0][1]=0; trans[0][2]=-h*sx+h;
+   trans[1][0] = 0; trans[1][1]=sy; trans[1][2]=-k*sy+k;
+   trans[2][0] = 0; trans[2][1]=0; trans[2][2]=1.0;
+
+}
+void transform(int n,int obj[3][20],float trans[3][3],int objdash[3][20])
+{
+       int i,j,k;
+       float sum;
+       for(i=0;i<n;i++)
+	   for(j=0;j<3;j++)
+	       {
+		   sum = 0.0;
+		   for(k=0;k<3;k++)
+		       sum = sum + ((float)trans[j][k]*obj[k][i]);
+		   objdash[j][i] = (int)(sum +0.5);
+	       }
+}
